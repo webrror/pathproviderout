@@ -83,11 +83,11 @@ Currently, not supported. Will mostly throw `MissingPluginException` or `Unsuppo
 
 ### macOS
 
-*Soon*
+![macOS Results](results/macos.png)
 
 ### iOS
 
-*Soon*
+![iOS Results](results/ios.jpeg)
 
 ### Android
 

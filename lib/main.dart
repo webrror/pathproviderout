@@ -14,16 +14,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String? _tempDirectory = 'Unknown';
-  String? _downloadsDirectory = 'Unknown';
-  String? _appSupportDirectory = 'Unknown';
-  String? _documentsDirectory = 'Unknown';
-  String? _cacheDirectory = 'Unknown';
+  Map<String, String> _directories = {};
   String? _refreshDateTime = 'Unknown';
-  String? _externalCacheDirectories = 'Unknown';
-  String? _externalStorageDirectories = 'Unknown';
-  String? _externalStorageDirectory = 'Unknown';
-  String? _libraryDirectory = 'Unknown';
 
   @override
   void initState() {
@@ -32,131 +24,62 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initDirectories() async {
-    String? tempDirectory;
-    String? downloadsDirectory;
-    String? appSupportDirectory;
-    String? documentsDirectory;
-    String? cacheDirectory;
-    String? externalCacheDirectories;
-    String? externalStorageDirectories;
-    String? libraryDirectory;
-    String? externalStorageDirectory;
+    final directories = {
+      'Temp Directory [getTemporaryDirectory()]': () async => (await getTemporaryDirectory()).path,
+      'Documents Directory [getApplicationDocumentsDirectory()]': () async => (await getApplicationDocumentsDirectory()).path,
+      'Downloads Directory [getDownloadsDirectory()]': () async => (await getDownloadsDirectory())?.path,
+      'Application Support Directory [getApplicationSupportDirectory()]': () async => (await getApplicationSupportDirectory()).path,
+      'Cache Directory [getApplicationCacheDirectory()]': () async => (await getApplicationCacheDirectory()).path,
+      'External Cache Directories [getExternalCacheDirectories()]': () async => (await getExternalCacheDirectories())?.join('\n'),
+      'External Storage Directory [getExternalStorageDirectory()]': () async => (await getExternalStorageDirectory())?.path,
+      'Library Directory [getLibraryDirectory()]': () async => (await getLibraryDirectory()).path,
+      'External Storage Directories [getExternalStorageDirectories()]': _fetchExternalStorageDirectories,
+    };
 
-    String? refreshDateTime;
-
-    try {
-      tempDirectory = (await getTemporaryDirectory()).path;
-    } on UnimplementedError {
-      tempDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      tempDirectory = 'Failed to get temp directory: $exception';
-    }
-    try {
-      downloadsDirectory = (await getDownloadsDirectory())?.path;
-    } on UnimplementedError {
-      downloadsDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      downloadsDirectory = 'Failed to get downloads directory: $exception';
-    }
+    Map<String, String> fetchedDirectories = {};
 
     try {
-      documentsDirectory = (await getApplicationDocumentsDirectory()).path;
-    } on UnimplementedError {
-      documentsDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      documentsDirectory = 'Failed to get documents directory: $exception';
+      await Future.wait(
+        directories.entries.map((entry) async {
+          try {
+            fetchedDirectories[entry.key] = (await entry.value() ?? "-");
+          } catch (e) {
+            fetchedDirectories[entry.key] = 'Failed: $e';
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('Error fetching directories: $e');
     }
 
-    try {
-      appSupportDirectory = (await getApplicationSupportDirectory()).path;
-    } on UnimplementedError {
-      appSupportDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      appSupportDirectory = 'Failed to get app support directory: $exception';
-    }
-
-    try {
-      cacheDirectory = (await getApplicationCacheDirectory()).path;
-    } on UnimplementedError {
-      cacheDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      cacheDirectory = 'Failed to get cache directory: $exception';
-    }
-
-    try {
-      externalCacheDirectories = (await getExternalCacheDirectories())?.join('\n');
-    } on UnimplementedError {
-      externalCacheDirectories = 'Method not implemented on this platform';
-    } catch (exception) {
-      externalCacheDirectories = 'Failed to get external cache directories: $exception';
-    }
-
-    try {
-      externalStorageDirectories = "Alarms: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.alarms))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nDownloads: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.downloads))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nMusic: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.music))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nMovies: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.movies))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nNotifications: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.notifications))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nPictures: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.pictures))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nPodcasts: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.podcasts))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nRingtones: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.ringtones))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nDCIM: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.dcim))?.join('\n') ?? '');
-
-      externalStorageDirectories += "\nDocuments: ";
-      externalStorageDirectories = externalStorageDirectories + ((await getExternalStorageDirectories(type: StorageDirectory.documents))?.join('\n') ?? '');
-    } on UnimplementedError {
-      externalStorageDirectories = 'Method not implemented on this platform';
-    } catch (exception) {
-      externalStorageDirectories = 'Failed to get external storage directories: $exception';
-    }
-
-    try {
-      libraryDirectory = (await getLibraryDirectory()).path;
-    } on UnimplementedError {
-      libraryDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      libraryDirectory = 'Failed to get library directory: $exception';
-    }
-
-    try {
-      externalStorageDirectory = (await getExternalStorageDirectory())?.path;
-    } on UnimplementedError {
-      externalStorageDirectory = 'Method not implemented on this platform';
-    } catch (exception) {
-      externalStorageDirectory = 'Failed to get external storage directory: $exception';
-    }
-
-    refreshDateTime = DateFormat('dd MMM yyyy \'at\' hh:mm:ss a').format(DateTime.now());
+    final refreshDateTime = DateFormat('dd MMM yyyy \'at\' hh:mm:ss a').format(DateTime.now());
 
     setState(() {
-      _tempDirectory = tempDirectory;
-      _downloadsDirectory = downloadsDirectory;
-      _appSupportDirectory = appSupportDirectory;
-      _documentsDirectory = documentsDirectory;
-      _cacheDirectory = cacheDirectory;
+      _directories = fetchedDirectories;
       _refreshDateTime = refreshDateTime;
-      _externalCacheDirectories = externalCacheDirectories;
-      _externalStorageDirectories = externalStorageDirectories;
-      _libraryDirectory = libraryDirectory;
-      _externalStorageDirectory = externalStorageDirectory;
     });
+  }
+
+  Future<String> _fetchExternalStorageDirectories() async {
+    final types = {
+      'Alarms': StorageDirectory.alarms,
+      'Downloads': StorageDirectory.downloads,
+      'Music': StorageDirectory.music,
+      'Movies': StorageDirectory.movies,
+      'Notifications': StorageDirectory.notifications,
+      'Pictures': StorageDirectory.pictures,
+      'Podcasts': StorageDirectory.podcasts,
+      'Ringtones': StorageDirectory.ringtones,
+      'DCIM': StorageDirectory.dcim,
+      'Documents': StorageDirectory.documents,
+    };
+
+    StringBuffer storageDirectories = StringBuffer();
+    for (var entry in types.entries) {
+      final directories = await getExternalStorageDirectories(type: entry.value);
+      storageDirectories.write('${entry.key}: ${directories?.join('\n') ?? 'None'}\n');
+    }
+    return storageDirectories.toString();
   }
 
   @override
@@ -169,28 +92,17 @@ class _MyAppState extends State<MyApp> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 12,
-              children: <Widget>[
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: 'Data last updated: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                      WidgetSpan(child: Row(children: [SelectableText(_refreshDateTime ?? "-"), IconButton(onPressed: () => initDirectories(), icon: const Icon(Icons.refresh))])),
-                    ],
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [Text('Data last updated: ', style: TextStyle(fontWeight: FontWeight.bold)), SelectableText(_refreshDateTime ?? "-"), IconButton(onPressed: initDirectories, icon: const Icon(Icons.refresh))]),
+                  ..._directories.entries.map(
+                    (entry) =>
+                        Padding(padding: const EdgeInsets.only(top: 8.0), child: RichText(text: TextSpan(text: '${entry.key}: ', style: const TextStyle(fontWeight: FontWeight.bold), children: [WidgetSpan(child: SelectableText(entry.value, style: const TextStyle(fontWeight: FontWeight.normal)))]))),
                   ),
-                ),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Temp Directory [getTemporaryDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_tempDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Documents Directory [getApplicationDocumentsDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_documentsDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Downloads Directory [getDownloadsDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_downloadsDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Application Support Directory [getApplicationSupportDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_appSupportDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Cache Directory [getApplicationCacheDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_cacheDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'External Cache Directories [getExternalCacheDirectories()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_externalCacheDirectories ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'External Storage Directories [getExternalStorageDirectories()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_externalStorageDirectories ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'External Storage Directory [getExternalStorageDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_externalStorageDirectory ?? "-"))])),
-                Text.rich(TextSpan(children: [TextSpan(text: 'Library Directory [getLibraryDirectory()]: ', style: TextStyle(fontWeight: FontWeight.bold)), WidgetSpan(child: SelectableText(_libraryDirectory ?? "-"))])),
-              ],
+                ],
+              ),
             ),
           ),
         ),
