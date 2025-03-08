@@ -91,4 +91,5 @@ Currently, not supported. Will mostly throw `MissingPluginException` or `Unsuppo
 
 ### Android
 
-*Soon*
+![Android Results](results/android1.png)
+![Android Results](results/android2.png)
