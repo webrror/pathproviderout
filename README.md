@@ -77,9 +77,9 @@ Currently, not supported. Will mostly throw `MissingPluginException` or `Unsuppo
 
 ![Windows Results](results/windows.png)
 
-### Linux
+### Linux (WSL - Ubuntu)
 
-*Soon*
+![Linux Results](results/linux.png)
 
 ### macOS
 
