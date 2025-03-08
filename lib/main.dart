@@ -61,23 +61,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<String> _fetchExternalStorageDirectories() async {
-    final types = {
-      'Alarms': StorageDirectory.alarms,
-      'Downloads': StorageDirectory.downloads,
-      'Music': StorageDirectory.music,
-      'Movies': StorageDirectory.movies,
-      'Notifications': StorageDirectory.notifications,
-      'Pictures': StorageDirectory.pictures,
-      'Podcasts': StorageDirectory.podcasts,
-      'Ringtones': StorageDirectory.ringtones,
-      'DCIM': StorageDirectory.dcim,
-      'Documents': StorageDirectory.documents,
-    };
-
     StringBuffer storageDirectories = StringBuffer();
-    for (var entry in types.entries) {
-      final directories = await getExternalStorageDirectories(type: entry.value);
-      storageDirectories.write('${entry.key}: ${directories?.join('\n') ?? 'None'}\n');
+    for(StorageDirectory directory in StorageDirectory.values) {
+      final directories = await getExternalStorageDirectories(type: directory);
+      storageDirectories.write('${directory.name}: ${directories?.join('\n') ?? 'None'}\n');
     }
     return storageDirectories.toString();
   }
