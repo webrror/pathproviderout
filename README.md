@@ -75,7 +75,7 @@ Currently, not supported. Will mostly throw `MissingPluginException` or `Unsuppo
 
 ### Windows
 
-![Windows Results](results\windows.png)
+![Windows Results](results/windows.png)
 
 ### Linux
 
