@@ -55,7 +55,7 @@ To run the app, follow these steps:
 
 3. Run 
     ```
-    flutter pub get
+    flutter run
     ``` 
     to launch the app on a simulator or physical device.
 
